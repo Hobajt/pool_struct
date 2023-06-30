@@ -184,3 +184,4 @@ private:
 #include "pool.inc"
 
 #undef POOL_STARTING_SIZE
+#undef POOL_NO_HOLE_SORTING
