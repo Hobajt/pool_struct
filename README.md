@@ -11,7 +11,7 @@ Custom data structure that I've built.
     - insert requires a unique identifier - key\* (sort of like a key in std::map)
     - elements can be accessed through their index (O(1)) or by their key (O(n))
     - remove operation doesn't change positions of other elements
-- Memory overhead per entry is ...
+- Memory overhead per entry is 12B + size of the key
 - Iteration:
     - faster than iterating over maps
     - is a bit dependent on the order of element removal tho
