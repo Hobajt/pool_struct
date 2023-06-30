@@ -9,4 +9,6 @@ include_directories("include")
 
 add_executable(test "src/test.cpp")
 add_executable(bench "src/bench.cpp")
+add_executable(dbg "src/dbg.cpp")
+
 

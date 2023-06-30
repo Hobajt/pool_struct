@@ -7,6 +7,8 @@
 #include <cstddef>
 #include <memory>
 
+#define POOL_NO_HOLE_SORTING
+
 //Custom data structure for object pooling - essentially a list + stack that tracks empty places.
 //Insert & remove are O(1), but element order isn't respected (elements are inserted into empty places, not at the end of struct).
 //Element adressing & access:
@@ -95,11 +97,11 @@ public:
         pointer m_end_ptr;
     };
 
-    iterator begin() { return iterator(&m_data[0], &m_data[m_capacity]); }
-    iterator end() { return iterator(&m_data[m_capacity], &m_data[m_capacity]); }
+    iterator begin() { return iterator(&m_data[m_first], &m_data[m_size+m_holes]); }
+    iterator end() { return iterator(&m_data[m_size+m_holes], &m_data[m_size+m_holes]); }
 
-    const_iterator begin() const { return const_iterator(&m_data[0], &m_data[m_capacity]); }
-    const_iterator end() const { return const_iterator(&m_data[m_capacity], &m_data[m_capacity]); }
+    const_iterator begin() const { return const_iterator(&m_data[m_first], &m_data[m_size+m_holes]); }
+    const_iterator end() const { return const_iterator(&m_data[m_size+m_holes], &m_data[m_size+m_holes]); }
 public:
     pool();
     pool(idxType capacity);
@@ -164,6 +166,7 @@ private:
 
     idxType fetchFreeSlot(const keyType& id);
     void clearSlot(idxType idx);
+    void sortHoles();
 
     void copy(const pool& p) noexcept;
     void move(pool&& p) noexcept;
@@ -172,6 +175,8 @@ private:
     slot* m_data;
     idxType m_capacity;
     idxType m_size;
+    idxType m_holes;
+    idxType m_first;
 };
 
 //========================

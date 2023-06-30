@@ -1,15 +1,15 @@
            ---            | vector         | pool           | map            | un_map         |  CHECKSUM     |
 ------------------------- | -------------- | -------------- | -------------- | -------------- | --------------|
-Insert                    |         0.60ms |         2.36ms |        10.17ms |         8.03ms |       Y       |
-Insert+Delete             |         0.46ms |         0.56ms |        36.66ms |        11.84ms |       Y       |
-Iteration (14)            |         0.27ms |         0.74ms |         4.11ms |         0.48ms |       Y       |
-Iteration (250)           |         3.30ms |        12.50ms |        91.98ms |        25.89ms |       Y       |
-Iteration (24000)         |       319.53ms |      2083.63ms |     12451.67ms |      6645.71ms |       Y       |
-Iteration (fragmented)    |       156.01ms |      2254.45ms |      8282.87ms |      5116.84ms |       Y       |
-Iteration (24000, r=0.10) |        30.16ms |      1885.66ms |      1047.11ms |       595.93ms |       Y       |
-Iteration (24000, r=0.25) |        75.46ms |      1881.17ms |      2959.71ms |      1386.36ms |       Y       |
-Iteration (24000, r=0.50) |       158.04ms |      1855.81ms |      6432.09ms |      3361.31ms |       Y       |
-Iteration (24000, r=0.75) |       236.11ms |      1926.28ms |      9534.95ms |      5288.90ms |       Y       |
+Insert                    |         0.59ms |         3.29ms |        10.12ms |         7.25ms |       Y       |
+Insert+Delete             |         0.47ms |         1.05ms |        36.08ms |        10.94ms |       Y       |
+Iteration (14)            |         0.27ms |         1.29ms |         3.98ms |         0.50ms |       Y       |
+Iteration (250)           |         3.28ms |        15.24ms |        89.84ms |        23.77ms |       Y       |
+Iteration (24000)         |       329.66ms |      1564.53ms |     12684.17ms |      6192.08ms |       Y       |
+Iteration (fragmented)    |       161.02ms |      1678.74ms |      8146.12ms |      4917.81ms |       Y       |
+Iteration (24000, r=0.10) |        28.30ms |       129.91ms |       995.85ms |       562.71ms |       Y       |
+Iteration (24000, r=0.25) |        71.05ms |       324.40ms |      2877.34ms |      1414.62ms |       Y       |
+Iteration (24000, r=0.50) |       161.03ms |       731.49ms |      6196.29ms |      3233.52ms |       Y       |
+Iteration (24000, r=0.75) |       252.56ms |      1097.11ms |      9501.16ms |      4743.60ms |       Y       |
 ------------------------- | -------------- | -------------- | -------------- | -------------- | --------------|
 Times are in [ms]
 rep count: 100000

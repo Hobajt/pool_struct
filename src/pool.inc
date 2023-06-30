@@ -9,10 +9,10 @@
 //===== Constructors =====
 
 template <typename T, typename K>
-pool<T, K>::pool() : m_capacity(0), m_size(0), m_data(nullptr) {}
+pool<T, K>::pool() : m_capacity(0), m_size(0), m_holes(0), m_data(nullptr) {}
 
 template <typename T, typename K>
-pool<T, K>::pool(idxType capacity) : m_capacity(capacity), m_size(0), m_data(nullptr) {
+pool<T, K>::pool(idxType capacity) : m_capacity(capacity), m_size(0), m_holes(0), m_data(nullptr) {
     allocate(capacity);
 }
 
@@ -248,6 +248,8 @@ typename pool<T, K>::idxType pool<T, K>::fetchFreeSlot(const keyType& id) {
     m_data[idx].taken = true;
     m_data[idx].info.id = id;
     m_size++;
+    m_holes = (m_holes > 0) ? (m_holes-1) : 0;
+    m_first = std::min(m_first, idx);
 
     return idx;
 }
@@ -262,11 +264,55 @@ void pool<T, K>::clearSlot(idxType idx) {
 
     //push freed slot index onto the stack
     m_data[m_size].info.idx = idx;
+
+    m_holes++;
+#ifndef POOL_NO_HOLE_SORTING
+    sortHoles();
+#endif
+    if(idx == m_first) {
+        while((++m_first) < (m_size+m_holes)) {
+            if(m_data[m_first].taken)
+                break;
+        }
+    }
+}
+
+template <typename T, typename K>
+void pool<T, K>::sortHoles() {
+    //binary search to find fitting position
+    idxType val = m_data[m_size].info.idx;
+    idxType start = m_size;
+    idxType end = m_size + m_holes;
+    idxType pos = start;
+    while(start < end) {
+        pos = start + (end-start)/2;
+        if(val < m_data[pos].info.idx)
+            end = pos;
+        else
+            start = pos+1;
+    }
+
+    // printf("S: %d, P: %d\n", (int)m_size, (int)pos);
+    
+    //insert sort to move new hole to proper position
+    for(idxType i = m_size; i < pos; i++) {
+        idxType tmp = m_data[i+1].info.idx;
+        m_data[i+1].info.idx = m_data[i].info.idx;
+        m_data[i].info.idx = tmp;
+
+        //reduce hole counter when hole is in it's original spot
+        if(m_data[i].info.idx == i)
+            m_holes = std::min(m_holes, i-m_size);
+    }
+    if(m_data[pos].info.idx == pos)
+        m_holes = std::min(m_holes, pos-m_size);
 }
 
 template <typename T, typename K>
 void pool<T, K>::copy(const pool& p) noexcept {
     m_size = p.m_size;
+    m_holes = p.m_holes;
+    m_first = p.m_first;
     m_capacity = p.m_capacity;
     m_data = (slot*)::operator new(m_capacity * sizeof(slot));
     for (idxType i = 0; i < m_capacity; i++) m_data[i] = slot(p.m_data[i]);
@@ -277,9 +323,11 @@ void pool<T, K>::move(pool&& p) noexcept {
     m_capacity = p.m_capacity;
     m_size = p.m_size;
     m_data = p.m_data;
+    m_holes = p.m_holes;
+    m_first = p.m_first;
 
     p.m_data = nullptr;
-    p.m_size = p.m_capacity = 0;
+    p.m_holes = p.m_first = p.m_size = p.m_capacity = 0;
 }
 
 template <typename T, typename K>
@@ -292,7 +340,7 @@ void pool<T, K>::release() noexcept {
         }
         ::operator delete(m_data, m_capacity * sizeof(slot));
     }
-    m_size = m_capacity = 0;
+    m_holes = m_first = m_size = m_capacity = 0;
 }
 
 //============================
